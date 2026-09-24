@@ -1,0 +1,5 @@
+# Fora do bundle OKF: entradas de repositório lidas pelo GitHub e por agentes,
+# e artefatos de build. O bundle é docs/ (guias e ADRs) mais as specs.
+/README.md
+/AGENTS.md
+/.lake
