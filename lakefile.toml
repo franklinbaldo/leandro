@@ -1,9 +1,14 @@
 name = "LeanDRO"
 version = "0.1.0"
-defaultTargets = ["LeanDRO"]
+defaultTargets = ["LeanDRO", "LeanDROTest"]
 
 # Sem dependências externas: núcleo do Lean apenas. Mathlib entra só quando
 # um módulo concreto precisar, por decisão registrada.
 
 [[lean_lib]]
 name = "LeanDRO"
+
+# Testes de auditoria: fixam com `#guard_msgs` as dependências de cada
+# teorema demonstrativo. Compilar é rodar o teste.
+[[lean_lib]]
+name = "LeanDROTest"
