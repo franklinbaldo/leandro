@@ -1,0 +1,1 @@
+-- Raiz da biblioteca LeanDRO: todo módulo que deve ser compilado entra aqui.

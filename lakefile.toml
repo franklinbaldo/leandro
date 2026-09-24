@@ -1,0 +1,9 @@
+name = "LeanDRO"
+version = "0.1.0"
+defaultTargets = ["LeanDRO"]
+
+# Sem dependências externas: núcleo do Lean apenas. Mathlib entra só quando
+# um módulo concreto precisar, por decisão registrada.
+
+[[lean_lib]]
+name = "LeanDRO"
