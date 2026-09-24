@@ -38,7 +38,7 @@ Toda conclusão material precisa permitir o caminho de volta: conclusão → pre
 | verdade documental | a fonte diz mesmo isso, nessa redação, nessa data? | testemunha + hash; Leizilla/CausaGanha |
 | escolha interpretativa | por que esta leitura e não a rival? | leitura nomeada, estabilidade, justificativa no `ledger` |
 
-Formulação herdada do programa de pesquisa em `papers`: Lean verifica consequência sob premissas; a auditoria jurídica audita as premissas. Compilação é necessária para afirmar uma derivação formal, nunca suficiente para afirmar uma conclusão jurídica.
+Formulação herdada do programa de pesquisa mantido separadamente (Papers, ainda sem publicação): Lean verifica consequência sob premissas; a auditoria jurídica audita as premissas. Compilação é necessária para afirmar uma derivação formal, nunca suficiente para afirmar uma conclusão jurídica.
 
 ## Regras de projeto
 
@@ -47,7 +47,8 @@ Formulação herdada do programa de pesquisa em `papers`: Lean verifica consequ�
 3. **Proveniência até a conclusão.** Todo `axiom` material tem `PremiseRecord` com `sources` não vazio, exceto `Assumption`.
 4. **Sem mutação silenciosa.** Mudança material de sentido gera nova declaração (`_v2`) ou novo módulo; a antiga vai para `deprecated` apontando a substituta (ADR-0004).
 5. **Sem `sorry` em `main`.** `lake build --wfail` e `scripts/verify.py` reprovam.
-6. **Axioma é suspeito por padrão.** Permitido, mas precisa de segmento de categoria no namespace e de registro. `#premises` reprova axioma fora do registro ou com categoria divergente.
+6. **Hipótese declarada é hipótese consumida.** `#hypotheses_consumed` reprova teorema cuja prova não usa uma das hipóteses proposicionais; `scripts/verify.py` exige que todo teorema de `LeanDRO/Law/` passe por ele. Hipótese ociosa é sinal de sobreformalização (achado 0001). O teste é estrutural: acha o que sobra, não prova que o resto é indispensável.
+7. **Axioma é suspeito por padrão.** Permitido, mas precisa de segmento de categoria no namespace e de registro. `#premises` reprova axioma fora do registro ou com categoria divergente.
 
 ## Como a categoria de uma premissa é lida
 
@@ -78,17 +79,19 @@ LeanDRO/
 ├── Temporal/Date.lean, Version.lean        data, redação, vigência
 ├── Source/Citation.lean, Witness.lean      URN LEX, testemunha, origem (fixture | leizilla)
 ├── Audit/Premise.lean, Command.lean        categorias, estabilidade, ledger, #premises
+├── Audit/Consumption.lean                  #hypotheses_consumed (hipótese ociosa)
 └── Law/BR/
     ├── Sources.lean                        URNs LEX federais, testemunha Planalto, origem fixture
     ├── Constitution/Art60.lean             slice: quórum de emenda
     └── LINDB/Art2.lean                     slice: repristinação (base jurídica de Temporal)
-LeanDROTest/Art60.lean, LINDB.lean          #guard_msgs das dependências + testes negativos
+LeanDROTest/Art60.lean, LINDB.lean          #guard_msgs das dependências e do consumo + testes negativos
+docs/findings/                              achados de auditoria da formalização
 scripts/verify.py                           portões locais
 ```
 
 ## LINDB como fundamento de `Temporal`
 
-`Temporal/` hoje só sabe comparar datas e dizer se uma redação cobre uma data. Quando uma norma entra em vigor, quando sai e se volta são perguntas que o direito positivo responde na LINDB (arts. 1º, 2º e 6º). A direção é que as regras de `Temporal` sobre transição entre versões sejam derivadas de premissas extraídas da LINDB, e não embutidas como convenção de engenharia. O primeiro passo é o slice do art. 2º, § 3º.
+`Temporal/` hoje só sabe comparar datas e dizer se uma redação cobre uma data. Quando uma norma entra em vigor, quando sai e se volta são perguntas que o direito positivo responde na LINDB (arts. 1º, 2º e 6º). A direção é que as regras de `Temporal` sobre transição entre versões sejam derivadas de premissas extraídas da LINDB, e não embutidas como convenção de engenharia. O primeiro passo é o slice do art. 2º, § 3º, que já rendeu o achado 0001: a primeira versão embutia uma leitura mais forte que o texto. Ele separa núcleo textual e leitura interpretativa, e é o caso-guia para a issue temporal.
 
 ## O que fica para depois
 

@@ -1,4 +1,5 @@
 import LeanDRO.Audit.Command
+import LeanDRO.Audit.Consumption
 import LeanDRO.Law.BR.Constitution.Art60
 
 open LeanDRO.Law.BR.Constitution.Art60
@@ -73,3 +74,49 @@ Negative.Fact.misfiled: registro diz textual, namespace diz fact
 #guard ledger.all (fun r => !r.sources.isEmpty)
 #guard par2.origin.isFixture
 #guard par2.device.urn == "urn:lex:br:federal:constituicao:1988-10-05;1988!art60_par2"
+
+/-! ## Consumo de hipóteses -/
+
+/--
+info: LeanDRO.Law.BR.Constitution.Art60.approved_of_tallies_given consome todas as hipóteses proposicionais
+-/
+#guard_msgs in
+#hypotheses_consumed approved_of_tallies_given
+/--
+info: LeanDRO.Law.BR.Constitution.Art60.approved_of_tallies consome todas as hipóteses proposicionais
+-/
+#guard_msgs in
+#hypotheses_consumed approved_of_tallies
+/--
+info: LeanDRO.Law.BR.Constitution.Art60.threeFifths_iff_min consome todas as hipóteses proposicionais
+-/
+#guard_msgs in
+#hypotheses_consumed threeFifths_iff_min
+/--
+info: LeanDRO.Law.BR.Constitution.Art60.threeFifths_mono consome todas as hipóteses proposicionais
+-/
+#guard_msgs in
+#hypotheses_consumed threeFifths_mono
+/--
+info: LeanDRO.Law.BR.Constitution.Art60.threeFifths_antitone_base consome todas as hipóteses proposicionais
+-/
+#guard_msgs in
+#hypotheses_consumed threeFifths_antitone_base
+
+/--
+info: LeanDRO.Law.BR.Constitution.Art60.camara_threshold consome todas as hipóteses proposicionais
+-/
+#guard_msgs in
+#hypotheses_consumed camara_threshold
+
+/--
+info: LeanDRO.Law.BR.Constitution.Art60.senado_threshold consome todas as hipóteses proposicionais
+-/
+#guard_msgs in
+#hypotheses_consumed senado_threshold
+
+/--
+info: LeanDRO.Law.BR.Constitution.Art60.par2_in_force_at_retrieval consome todas as hipóteses proposicionais
+-/
+#guard_msgs in
+#hypotheses_consumed par2_in_force_at_retrieval
