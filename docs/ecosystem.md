@@ -74,6 +74,8 @@ O CausaGanha não tem noção de "promoção"; a barreira nasce aqui. Lacunas a 
 
 ## Papers — pesquisa
 
+Repositório privado, ainda sem publicação. Não é documentação pública do LeanDRO; quando houver conteúdo publicável, o resumo público será apontado aqui.
+
 **Possui:** o DAG de frentes de pesquisa, os papers e o programa "raciocínio jurídico auditável" (pipeline Argdown → Lean → revisão substantiva).
 
 O estado de pesquisa do LeanDRO vive lá, não aqui (ADR-0005). A pergunta norteadora inicial, a registrar como frente:
