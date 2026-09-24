@@ -19,7 +19,9 @@ Portões, na ordem:
   3. imports              todo .lean de LeanDRO/ é alcançável por LeanDRO.lean.
   4. axiomas              todo `axiom` fica sob um segmento de categoria.
   5. hashes               textHash de cada fixture confere com o texto.
-  6. OKF                  okf-parser check na versão fixada.
+  6. consumo              todo theorem de LeanDRO/Law passa por
+                          #hypotheses_consumed num teste (achado 0001).
+  7. OKF                  okf-parser check na versão fixada.
 """
 
 from __future__ import annotations
@@ -122,6 +124,23 @@ def portao_hashes() -> list[str]:
     return erros
 
 
+def portao_consumo() -> list[str]:
+    """Todo teorema jurídico precisa ser examinado pelo detector de hipótese
+    ociosa; o `lake build` garante que o resultado examinado é o fixado."""
+    teoremas = set()
+    for p in sorted((RAIZ / "LeanDRO" / "Law").rglob("*.lean")):
+        codigo = sem_comentarios_nem_strings(p.read_text(encoding="utf-8"))
+        teoremas |= {(m.group(1), p) for m in re.finditer(r"^\s*theorem\s+([\w.]+)", codigo, re.M)}
+    examinados = set()
+    for p in sorted((RAIZ / "LeanDROTest").rglob("*.lean")):
+        examinados |= set(re.findall(r"^#hypotheses_consumed\s+([\w.]+)", p.read_text(encoding="utf-8"), re.M))
+    return [
+        f"{p.relative_to(RAIZ)}: teorema `{nome}` sem #hypotheses_consumed em LeanDROTest/"
+        for nome, p in sorted(teoremas)
+        if nome not in examinados
+    ]
+
+
 def portao_okf() -> list[str]:
     if shutil.which("uvx") is None:
         return ["uvx não encontrado: instale uv para validar o OKF"]
@@ -137,6 +156,7 @@ PORTOES = [
     ("imports", portao_imports),
     ("axiomas categorizados", portao_axiomas),
     ("hashes das fixtures", portao_hashes),
+    ("hipóteses consumidas", portao_consumo),
     ("OKF", portao_okf),
 ]
 
