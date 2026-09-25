@@ -107,7 +107,7 @@ def portao_axiomas() -> list[str]:
         codigo = sem_comentarios_nem_strings(p.read_text(encoding="utf-8"))
         for m in re.finditer(r"^\s*axiom\s+([\w.]+)", codigo, re.M):
             partes = m.group(1).split(".")
-            if len(partes) < 2 or partes[-2] not in CATEGORIAS:
+            if not CATEGORIAS & set(partes[:-1]):
                 erros.append(f"{p.relative_to(RAIZ)}: axioma `{m.group(1)}` sem segmento de categoria")
     return erros
 

@@ -24,7 +24,7 @@ O que o LeanDRO **não** é: crawler, banco de legislação, sistema processual,
 Bootstrap. Dois vertical slices, pequenos de propósito: eles existem para exercitar a cadeia fonte → dispositivo → vigência → proposição → premissas → teorema → auditoria, não para "formalizar muito direito". Tudo está marcado `experimental`.
 
 - [`Law/BR/Constitution/Art60.lean`](LeanDRO/Law/BR/Constitution/Art60.lean): quórum de aprovação de emenda (CF/88, art. 60, § 2º).
-- [`Law/BR/LINDB/Art2.lean`](LeanDRO/Law/BR/LINDB/Art2.lean): vedação da repristinação tácita (LINDB, art. 2º, § 3º). A LINDB é a norma sobre vigência e revogação das normas, e por isso é a base jurídica da camada `Temporal`. O slice separa o núcleo textual (`Textual.par3_core`) da leitura da exceção "salvo disposição em contrário" (`Interpretive.contrary_provision_restores`).
+- [`Law/BR/LINDB/Art2.lean`](LeanDRO/Law/BR/LINDB/Art2.lean): vedação da repristinação tácita (LINDB, art. 2º, § 3º). A LINDB é a norma sobre vigência e revogação das normas, e por isso é a base jurídica da camada `Temporal`. O slice afirma só o núcleo textual (`Textual.par3_core`). A leitura de que a "disposição em contrário" restaura a lei revogada vive numa teoria nomeada (`RepristinationTheory`), que os teoremas recebem como hipótese; nenhum `axiom` a afirma (ADR-0006).
 
 A base textual dos slices é uma **fixture** transcrita do portal do Planalto, declarada como tal no tipo (`Origin.fixture`): o Leizilla ainda não cobre a legislação federal.
 
@@ -65,7 +65,7 @@ uv run scripts/verify.py   # todos os portões locais (build --wfail, sorry, imp
 - [docs/ecosystem.md](docs/ecosystem.md) — fronteiras com Leizilla, CausaGanha, Papers e Skills
 - [docs/prior-art.md](docs/prior-art.md) — trabalhos anteriores e o que não reivindicamos
 - [docs/findings/](docs/findings/) — achados de auditoria da formalização
-- [docs/adr/](docs/adr/) — decisões que sustentam o desenho
+- [docs/adr/](docs/adr/) — decisões que sustentam o desenho (ADR-0006: leitura candidata → teoria nomeada → premissa versionada)
 
 ## Licença
 

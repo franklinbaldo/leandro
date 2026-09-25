@@ -43,7 +43,7 @@ Formulação herdada do programa de pesquisa mantido separadamente (Papers, aind
 ## Regras de projeto
 
 1. **Lean prova consequência, não autoridade.** Nenhum texto do projeto diz "o Lean demonstrou que X é o direito".
-2. **Interpretação visível.** Escolha interpretativa disputável não entra no corpo de uma `def`. Ela vira `Prop` com nome, e a adotada é afirmada por um `axiom` em `Interpretive`. A rival fica declarada (sem afirmação) para que a escolha seja contestável. No art. 60: `TotalMembershipReading` (adotada) e `PresentMembersReading` (rival).
+2. **Interpretação visível, e afirmada só quando publicada.** Escolha interpretativa disputável não entra no corpo de uma `def`. Ela sobe em três degraus (ADR-0006): leitura candidata (`Prop` com nome), teoria nomeada (`structure <Tema>Theory`, recebida como hipótese) e, só quando se publica deliberadamente uma versão, premissa `axiom` em `Interpretive.<Tema>.V<n>`. Na LINDB: `RepristinationTheory`, sem `axiom`. O art. 60 ainda afirma `TotalMembershipReading` por `axiom` direto, porque é anterior à ADR-0006; a migração está pendente.
 3. **Proveniência até a conclusão.** Todo `axiom` material tem `PremiseRecord` com `sources` não vazio, exceto `Assumption`.
 4. **Sem mutação silenciosa.** Mudança material de sentido gera nova declaração (`_v2`) ou novo módulo; a antiga vai para `deprecated` apontando a substituta (ADR-0004).
 5. **Sem `sorry` em `main`.** `lake build --wfail` e `scripts/verify.py` reprovam.

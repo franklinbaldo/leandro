@@ -77,13 +77,18 @@ structure PremiseRecord where
   /-- Por que a premissa diz o que diz, em uma ou duas frases. -/
   rationale : String
 
-/-- Categoria lida do segmento de namespace pai do nome. -/
+/-- Categoria lida do segmento de categoria mais próximo acima do nome.
+Aceita `...Textual.nome` e também a forma versionada da ADR-0006,
+`...Interpretive.Repristination.V1.nome`. -/
 def kindOfName (n : Lean.Name) : Option PremiseKind :=
-  match n with
-  | .str parent _ =>
-    match parent with
-    | .str _ seg => PremiseKind.all.find? (·.segment == seg)
-    | _ => none
-  | _ => none
+  go n.getPrefix
+where
+  go : Lean.Name → Option PremiseKind
+    | .str parent seg =>
+      match PremiseKind.all.find? (·.segment == seg) with
+      | some k => some k
+      | none => go parent
+    | .num parent _ => go parent
+    | .anonymous => none
 
 end LeanDRO.Audit
