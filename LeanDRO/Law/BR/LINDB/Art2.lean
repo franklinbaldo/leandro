@@ -22,10 +22,11 @@ Aquelas declarações ficam abaixo, `deprecated`, para reproduzir o achado
 * **núcleo textual** (`ParThreeCore`): revogada `a` por `b`, perdida a
   vigência de `b`, e sem disposição em contrário, `a` não se restaura por
   isso. Nada além.
-* **regra interpretativa** (`ContraryProvisionRestoresReading`): havendo
-  disposição em contrário, `a` se restaura. O texto abre a exceção, mas não
-  diz a forma, a suficiência nem os efeitos da disposição repristinatória;
-  dizer que ela basta é interpretação.
+* **teoria interpretativa** (`RepristinationTheory`): havendo disposição em
+  contrário, `a` se restaura. O texto só retira a vedação nesse caso; dizer
+  que a disposição restaura é leitura adicional. Por isso a teoria é
+  declarada e recebida como hipótese, nunca afirmada por `axiom` (ADR-0006).
+  Uma versão anterior deste módulo a afirmava; ver achado 0001, segunda parte.
 
 ## O que continua fora
 
@@ -78,25 +79,37 @@ ter") é do texto e fica no predicado, em vez de virar "`a` volta a vigorar"
 sem qualificação. -/
 opaque RestoredByLapse : Law → Law → Prop
 
-/-! ## Núcleo textual e regra interpretativa, com nome -/
+/-! ## Núcleo textual -/
 
 /-- O que o § 3º diz, e só isso. -/
 def ParThreeCore : Prop :=
   ∀ a b d₀ d₁, RevokedBy a b d₀ → LapsesAt b d₁ → ¬ ContraryProvision a b →
     ¬ RestoredByLapse a b
 
-/-- Leitura da exceção: a disposição em contrário basta para restaurar. -/
-def ContraryProvisionRestoresReading : Prop :=
-  ∀ a b d₀ d₁, RevokedBy a b d₀ → LapsesAt b d₁ → ContraryProvision a b →
-    RestoredByLapse a b
-
 /-- § 3º, núcleo: "Salvo disposição em contrário, a lei revogada não se
 restaura por ter a lei revogadora perdido a vigência." -/
 axiom Textual.par3_core : ParThreeCore
 
-/-- A exceção "salvo disposição em contrário" lida como suficiente para
-restaurar. Interpretação, não texto. -/
-axiom Interpretive.contrary_provision_restores : ContraryProvisionRestoresReading
+/-! ## Teorias interpretativas: declaradas, não afirmadas (ADR-0006)
+
+A exceção "salvo disposição em contrário" **retira a vedação** naquele
+caso. Ela não diz, sozinha, que a disposição em contrário restaura: essa é
+uma leitura adicional. Por isso a leitura existe aqui como candidata com
+nome e como campo de uma teoria, e os teoremas a recebem como hipótese.
+Nenhum `axiom` a afirma. -/
+
+/-- Leitura candidata: havendo disposição em contrário, a lei revogada se
+restaura com a perda de vigência da revogadora. -/
+def ContraryProvisionRestores : Prop :=
+  ∀ a b d₀ d₁, RevokedBy a b d₀ → LapsesAt b d₁ → ContraryProvision a b →
+    RestoredByLapse a b
+
+/-- Teoria da repristinação: os compromissos interpretativos que completam o
+núcleo textual. Um valor deste tipo é uma teoria assumida; teorias rivais
+podem ganhar outras estruturas, e suas consequências ficam comparáveis
+porque cada teorema diz qual teoria recebe. -/
+structure RepristinationTheory : Prop where
+  contraryProvisionRestores : ContraryProvisionRestores
 
 /-! ## Consequências -/
 
@@ -115,25 +128,30 @@ theorem not_restored_by_lapse
     ¬ RestoredByLapse a b :=
   not_restored_by_lapse_given Textual.par3_core a b d₀ d₁ hRev hLapse hNo
 
-/-- A exceção, sob a leitura interpretativa; depende só dela. -/
-theorem restored_by_lapse_of_contrary
+/-- O que o texto sustenta sem teoria alguma: se a lei se restaurou pela
+perda de vigência da revogadora, havia disposição em contrário. A direção
+oposta não sai do texto. -/
+theorem contrary_of_restored_by_lapse
+    (a b : Law) (d₀ d₁ : Date) (hRev : RevokedBy a b d₀) (hLapse : LapsesAt b d₁)
+    (hRestored : RestoredByLapse a b) :
+    ContraryProvision a b :=
+  Classical.byContradiction fun hNo =>
+    not_restored_by_lapse a b d₀ d₁ hRev hLapse hNo hRestored
+
+/-- A exceção, sob uma teoria que a lê como restauradora. -/
+theorem restored_by_lapse_of_contrary (T : RepristinationTheory)
     (a b : Law) (d₀ d₁ : Date) (hRev : RevokedBy a b d₀) (hLapse : LapsesAt b d₁)
     (hYes : ContraryProvision a b) :
     RestoredByLapse a b :=
-  Interpretive.contrary_provision_restores a b d₀ d₁ hRev hLapse hYes
+  T.contraryProvisionRestores a b d₀ d₁ hRev hLapse hYes
 
-/-- Juntos, texto e leitura dão uma equivalência: revogada `a` por `b` e
-perdida a vigência de `b`, `a` se restaura por isso se, e somente se, há
-disposição em contrário. A ida precisa de lógica clássica, e o `#premises`
-mostra isso. -/
-theorem restored_by_lapse_iff_contrary
+/-- Núcleo textual mais teoria dão a equivalência. Sem a teoria, só vale a
+ida (`contrary_of_restored_by_lapse`). -/
+theorem restored_by_lapse_iff_contrary (T : RepristinationTheory)
     (a b : Law) (d₀ d₁ : Date) (hRev : RevokedBy a b d₀) (hLapse : LapsesAt b d₁) :
-    RestoredByLapse a b ↔ ContraryProvision a b := by
-  constructor
-  · intro hRestored
-    exact Classical.byContradiction fun hNo =>
-      not_restored_by_lapse a b d₀ d₁ hRev hLapse hNo hRestored
-  · exact restored_by_lapse_of_contrary a b d₀ d₁ hRev hLapse
+    RestoredByLapse a b ↔ ContraryProvision a b :=
+  ⟨contrary_of_restored_by_lapse a b d₀ d₁ hRev hLapse,
+   restored_by_lapse_of_contrary T a b d₀ d₁ hRev hLapse⟩
 
 /-! ## Obsoleto: formulação do achado 0001
 
@@ -150,8 +168,8 @@ def ExpressRestorationOnlyReading : Prop :=
   ∀ a b d₀ d, RevokedBy a b d₀ → d₀ ≤ d → InForce a d →
     ∃ r dᵣ, ExpressRestoration r a dᵣ ∧ d₀ ≤ dᵣ ∧ dᵣ ≤ d
 
-/-- **Obsoleto** (achado 0001). Substituído por `Textual.par3_core` e
-`Interpretive.contrary_provision_restores`. -/
+/-- **Obsoleto** (achado 0001). Substituído por `Textual.par3_core` e pela
+`RepristinationTheory` (recebida como hipótese). -/
 axiom Interpretive.adopt_express_restoration_only : ExpressRestorationOnlyReading
 
 /-- **Obsoleto** (achado 0001). Forma condicional. -/
@@ -179,12 +197,9 @@ def ledger : List PremiseRecord := [
   { name := ``Textual.par3_core, kind := .textual, stability := .experimental,
     sources := [par3],
     rationale := "Só o que o § 3º diz: sem disposição em contrário, a perda de vigência da revogadora não restaura a revogada." },
-  { name := ``Interpretive.contrary_provision_restores, kind := .interpretive,
-    stability := .experimental, sources := [par3],
-    rationale := "A exceção 'salvo disposição em contrário' lida como suficiente para restaurar; o texto não fixa forma, suficiência nem efeitos." },
   { name := ``Interpretive.adopt_express_restoration_only, kind := .interpretive,
     stability := .deprecated, sources := [par3],
-    rationale := "Obsoleto pelo achado 0001: leitura mais forte que o texto, que tornava ociosa a condição da perda de vigência. Substituído por Textual.par3_core + Interpretive.contrary_provision_restores." }
+    rationale := "Obsoleto pelo achado 0001: leitura mais forte que o texto, que tornava ociosa a condição da perda de vigência. Substituído por Textual.par3_core + RepristinationTheory como hipótese (ADR-0006)." }
 ]
 
 end LeanDRO.Law.BR.LINDB.Art2
